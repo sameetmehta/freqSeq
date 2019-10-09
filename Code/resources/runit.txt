@@ -1,0 +1,39 @@
+
+1. Concatenate the read files.
+
+   cd Unaligned/
+   cat sample_R1_* > ../reads1.fastq.gz
+   cat sample_R2_* > ../reads2.fastq.gz
+
+2. Trim the linker off, and log which read had the linker.
+
+   python findLinkers reads1.fastq.gz reads2.fastq.gz trim1.fastq.gz trim2.fastq.gz trimlogtxt
+
+3. Align the reads to the human reference
+
+   pbm hg19
+   pbm bwa
+   pbm samtools
+
+   bwa mem -M -t 8 $REF trim1.fastq.gz trim2.fastq.gz | samtools view -hS - > aligned.bam
+   samtools sort -@ 8 -m 2G -O bam -T xxx aligned.bam > aligned.sorted.bam
+
+   samtools flagstat aligned.sorted.bam > bamlog.txt
+
+4. Separate the alignments and count the read types
+
+   samtools view aligned.sorted.bam | ../countlocations $REF
+
+   cat > countlog.txt
+      - Cut and paste the last output line.
+
+5. Organize the lists of duplicates
+
+   python ../msort.py < PyPy.txt > PyPy_sorted.txt
+   python ../dupcnt.py < PyPy_sorted.txt > PyPy_recurrent.txt 2> PyPy_single.txt
+   python ../msort.py < PyPu.txt > PyPu_sorted.txt
+   python ../dupcnt.py < PyPu_sorted.txt > PyPu_recurrent.txt 2> PyPu_single.txt
+   python ../msort.py < PuPy.txt > PuPy_sorted.txt
+   python ../dupcnt.py < PuPy_sorted.txt > PuPy_recurrent.txt 2> PuPy_single.txt
+   python ../msort.py < PuPu.txt > PuPu_sorted.txt
+   python ../dupcnt.py < PuPu_sorted.txt > PuPu_recurrent.txt 2> PuPu_single.txt

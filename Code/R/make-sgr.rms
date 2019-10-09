@@ -1,0 +1,4 @@
+#### makeSGR sample <sample>.sgr
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+make.smooth.from.RMS("<sample>")

@@ -1,0 +1,37 @@
+#### makevector sample <sample>-dinuc-mito-single-recurrent.vec
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+
+vec.genomic <- make.dimer.count.vector(pat = "<sample>", suffix = "/*-single-recurrent.txt")
+save(vec.genomic, file = "<sample>-dinuc-genomic-single-recurrent.vec")
+
+vec.mito    <- make.dimer.count.vector("<sample>", suffix = "/*-single-recurrent.txt", mito=T)
+save(vec.mito, file = "<sample>-dinuc-mito-single-recurrent.vec")
+
+#### makematrix all mito-dinuc-matrix-single-recurrent.mat
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+make.matrix.from.vec("genomic", "sample-sheet.txt", suff="-single-recurrent")
+make.matrix.from.vec("mito", "sample-sheet.txt", suff="-single-recurrent")
+
+#### plotMatrix all -
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+genome.mat <- read.delim("genomic-dinuc-matrix-single-recurrent.mat", as.is=T, header=T, row.names=1, stringsAsFactors=F)
+plot.dimer.matrix(as.matrix(genome.mat), "genomic-single-recurrent-dinuc-frequency-normalized.pdf")
+mito.mat <- read.delim("mito-dinuc-matrix-single-recurrent.mat", as.is=T, header=T, row.names=1, stringsAsFactors=F)
+plot.dimer.matrix(as.matrix(mito.mat), "mito-single-recurrent-dinuc-frequency-normalized.pdf")
+
+#### makebarplot sample <sample>-barplot-mito-100bp-single-recurrent-window.pdf
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+make.window.barplots("<sample>", ofn="<sample>-barplot-genomic-100bp-single-recurrent-window.pdf", suff="*-single-recurrent.txt")
+make.window.barplots("<sample>", ofn="<sample>-barplot-mito-10bp-single-recurrent-window.pdf", suff="*-single-recurrent.txt", mito=TRUE, window=10)
+
+#### makeBinCounts sample <sample>-all-counts-single-recurrent.done
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+get.barplot.counts.save("<sample>", "single-recurrent", suff = "*-single-recurrent.txt")
+get.barplot.counts.save("<sample>", "single-recurrent", suff = "*-single-recurrent.txt", mito=TRUE, window=10)
+system("touch <sample>-all-counts-single-recurrent.done")
+

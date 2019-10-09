@@ -1,0 +1,18 @@
+#### makecircos sample <sample>-PyPy-100bp-strand-single-recurrent.circos
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+make.circos.ready.forRMS.nocentro("<sample>/PuPu-single-recurrent.txt", "<sample>-PuPu-100bp-strand-single-recurrent.circos", "<sample>-PuPu-centromeric-single-recurrent.txt", "<sample>-PuPu-centro.stats")
+make.circos.ready.forRMS.nocentro("<sample>/PuPy-single-recurrent.txt", "<sample>-PuPy-100bp-strand-single-recurrent.circos", "<sample>-PuPy-centromeric-single-recurrent.txt", "<sample>-PuPy-centro.stats")
+make.circos.ready.forRMS.nocentro("<sample>/PyPu-single-recurrent.txt", "<sample>-PyPu-100bp-strand-single-recurrent.circos", "<sample>-PyPu-centromeric-single-recurrent.txt", "<sample>-PyPu-centro.stats")
+make.circos.ready.forRMS.nocentro("<sample>/PyPy-single-recurrent.txt", "<sample>-PyPy-100bp-strand-single-recurrent.circos", "<sample>-PyPy-centromeric-single-recurrent.txt", "<sample>-PyPy-centro.stats")
+
+#### makeCircosUnique sample <sample>-PyPy-100bp-strand-single-recurrent-unique.circos
+##R
+source("~/GitHub/CPDAnalysis/Code/R/pypy-analysis-functions.R")
+for(i in c("PuPu", "PuPy", "PyPu", "PyPy")){
+    input <- paste("<sample>/", i, "-single-recurrent.txt", sep="")
+    output <- paste("<sample>-", i, "-100bp-strand-single-recurrent-unique.circos", sep="")
+    make.circos.unique.mapping(input, output, window = 100, strand = TRUE, mito = FALSE)
+}
+
+#### 

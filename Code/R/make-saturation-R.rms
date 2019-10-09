@@ -1,0 +1,125 @@
+##env
+module load GCCcore/4.9.3
+
+#### makeSample sample <sample>-PyPy-pos.txt
+##R
+library(tidyverse)
+library(data.table)
+library(dtplyr)
+
+read.data <- function(fn){
+    DT <- fread(fn, stringsAsFactors=F, header=F)
+    my.col.names <- c("chr", "damage.pos", "strand", "damage.match", "length",
+                      "flags1", "flags2", "CIGAR1", "flags3", "damage.end", "damage.end.match",
+                      "flags4", "flags5", "CIGAR2", "flags6", "flags7", "flags8")
+    setnames(DT, colnames(DT), my.col.names)
+    df <- DT %>% select(1:3, 9, 10, 15:17, 4)
+    df
+}
+
+get.dat.filtered <- function(fn){
+    
+    dat <- read.data(fn)
+    
+    setDF(dat)
+
+    perfect1 <- (dat[,4] == "MD:Z:58")
+    perfect1 <- perfect1 & !grepl("58M,0", dat[,7])
+    err1 <- grepl("MD:Z:[^0][0-9]*[ACGT][0-9]*$", dat[,4])
+    err1 <- err1 & !grepl("58M,[01]", dat[,7])
+    dat <- dat[perfect1 | err1,,drop=FALSE]
+    
+    perfect2 <- (dat[,6] == "MD:Z:66")
+    perfect2 <- perfect2 & !grepl("66M,0", dat[,8])
+    err2 <- grepl("MD:Z:[^0][0-9]*[ACGT][0-9]*$", dat[,6])
+    err2 <- err2 & !grepl("66M,[01]", dat[,8])
+    dat <- dat[perfect2 | err2,,drop=FALSE]
+    
+    unduplicated <- !duplicated(dat[,c(2,5)])
+    dat <- dat[unduplicated,,drop=FALSE]
+    dat <- dat %>% select(1, 2, 3, ncol(dat))
+}
+
+make.fl <- function(prefs){
+    # Create a file list for every prefix
+    # fl <- file.path(snames, paste(prefix, "-single-recurrent.txt", sep = ""))
+    fl <- file.path("<sample>", paste(prefs, "single-recurrent.txt", sep = "-"))
+    fl
+}
+
+make.dimer <- function(vec){
+    unlist(lapply(vec, function(x)process.str(x)))
+}
+
+process.str <- function(s){
+   s <- gsub("\\*", "", s)
+   s <- unlist(strsplit(s, ""))[10:11] %>%
+        paste0(collapse = "")
+}
+
+prefs <- c("PuPu", "PuPy", "PyPu", "PyPy")
+
+fl <- make.fl(prefs)
+for(i in seq_along(fl)){
+    of.dimer <- paste("<sample>", "-", prefs[i], "-dimer.txt", sep = "")
+    of.pos   <- paste("<sample>", "-", prefs[i], "-pos.txt", sep = "")
+    
+    df <- get.dat.filtered(fl[i])
+    df$damage.match <- df %>% select(damage.match) %>% unlist() %>% as.vector() %>% make.dimer()
+    
+##     df %>% select(damage.match) %>% unlist() %>% as.vector() %>%
+##            make.dimer() %>% table() %>% as.data.frame() -> dimer.df
+##     colnames(dimer.df) <- c("dimer", "<sample>")
+##     write.table(dimer.df, of.dimer, row.names = F, col.names = T, sep = "\t",
+##                 quote = F)
+    
+    # df %>% select(chr, damage.pos, strand, damage.match) %>% 
+    # colnames(df.pos)[5] <- "<sample>"
+
+    write.table(df, of.pos, row.names = F, col.names = T, sep = "\t", quote = F)
+}
+
+#### MakeSaturation all PyPy-all-sample-position.txt
+##R
+
+library(tidyverse)
+library(data.table)
+library(dtplyr)
+
+prefs <- c("PuPu", "PuPy", "PyPu", "PyPy")
+
+# fl <- list.files(pattern = "PyPy-pos.txt")
+
+for(i in seq_along(prefs)){
+    pattern = paste(prefs[i], "-pos.txt", sep = "")
+    fl <- list.files(pattern = pattern)
+    ofn <- paste(prefs[i], "-all-sample-position.txt", sep = "")
+    print(use.fl) # for debugging
+    
+    for(j in seq_along(fl)){
+        sname <- gsub(pattern, "", fl[j])
+        df <- fread(fl[j], header = T)
+	if(j == 1){
+	    dimer.df <- df %>% select(damage.match) %>% unlist() %>%
+	                as.vector() %>% table() %>% as.data.frame()
+	    colnames(dimer.df) <- c("dimer", sname)
+	    dimer.df <- dimer.df %>% filter(!grepl("N", dimer))
+	}
+	else {
+            all.pos.df <- merge(all.pos.df, df, by = c("chr", "damage.pos", "strand"), all = T)
+	}
+    }
+    for(k in 4:ncol(all.pos.df)){
+        all.pos.df[, k][is.na(all.pos.df[, k])] <- 0
+    }
+    write.table(all.pos.df, ofn, row.names = F, col.names = T, quote = F, sep = "\t")
+    seen.position <- colSums(all.pos.df[, 4:ncol(all.pos.df)])
+    sat.vector <- cumsum(seen.position)
+
+    ofn.2 <- paste(prefs[i], "-cumsum-values.txt", sep = "")
+    sat.df <- data.frame(n.exp = 1:length(sat.vector), 
+                         number.of.positions = seen.position,
+			 cumulative.sum = sat.vector)
+    write.table(sat.df, ofn.2, row.names = F, col.names = T, quote = F, sep = "\t")
+}
+
