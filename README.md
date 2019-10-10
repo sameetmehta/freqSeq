@@ -44,7 +44,7 @@ computing cluster. The basic steps involved in this method are as follows:
      aligned R1 read is a C. The result is assumed to reflect the known rapid
      deamination of a cytosine within a CPD.
 
-## The steps Sequence Aanalysis - I
+### The steps Sequence Aanalysis - I
 
 Here we will describe the exact steps that we use to analyze the data.
 
@@ -90,7 +90,7 @@ files that have all the lesions that are in the single+recurrent file for each
 of the sample. These files are `SAM` files with few extra columns. This is a
 tab-separated-file, and is quite amenable to analysis using `R`.
 
-## Steps for Analysis - II
+### Steps for Analysis - II
 
 The single+recurrent lesions for each sample can be analyzed using `R`. Most the
 analysis is possible in a interactive manner.
