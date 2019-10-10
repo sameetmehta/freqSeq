@@ -1,41 +1,48 @@
-# freqseq: A statistical method to quantify rare lesions at single-base resolution across the genome.
+# freqSeq: A statistical method to quantify rare DNA lesions at single-base resolution across the genome.
 
 ## Structure of the analysis
 
 The method is effectively divided into a number of steps. One of the primary
-requirements for this method to work is availablity of a high-performance
+requirements for this method to work is availability of a high-performance
 computing cluster. The basic steps involved in this method are as follows:
 
- * Deterine which read for the pared fastq reads has the linker.
+ * Determine which read of the fastq read pair has the linker. Designate the
+   read having a linker as R1, and the other read as R2.
  * Trim the linker, and any preceding nucleotides. The first base of the R1 now
-   denotes the position immediately downstream of the lesion. If no linker
+   denotes the position immediately downstream (3') of the incision nick. In
+   case of cyclobutane pyrimidne dimer (CPD), the first base of R1 is the 3'
+   base of this two base PyPy lesion and is termed the "+1 base". If no linker
    sequence is found, the read pair is saved to a different file, and not used
    in the current analysis.
- * Designate the read with linker as R1, and the other as R2. R1 after this step
-   is always the proximal end (nearest to the lesion), and R2 is always distal
-   to the legion.
+ * R1 after this step is always the proximal end (nearest to the lesion), and R2
+   is always distal to the lesion.
  * Align the reads to the reference genome.
- * Read through the bam files, and for all the R1 alignments re-create upstream
-   10 bases on the correct strand.
- * Save this information to a file, and then divide the file by class of lesion.
-   For our purposes there are four classes of legions viz.,
+ * Read through the bam files, and for each R1 alignment re-create the upstream
+   10 bases on the correct strand (bases -1 through -10). In the case of CPD,
+   base -1 is the 5' base of this two-base PyPy lesion.
+ * Save this information to a file, and then divide the file according to the
+   class of lesion. For our purposes there are four classes of legions viz.,
    * PuPu -- The first base of R1, and immediate preceding base both are
      purines.
-   * PuPy -- The first base of R1 is a purine but immediate preceding base is a
-     pyrimidine.
-   * PyPu -- The first base of R1 is a pyrimidine, and immediate preceding base
-     is a purine.
+   * PuPy -- The first base of R1 is a pyrimidne but immediate preceding base is
+     a purine.
+   * PyPu -- The first base of R1 is a purine, and immediate preceding base is a
+     pyrimidne.
    * PyPy -- The first base of the R1 is pyrimidine, and the immediate preceding
-     base is also a pyrimidne.
+     base is also a pyrimdine.
  
- * For each of these files we determine of the given read pair is
+ * For each of these files (classified according to the lesion) we determine if
+   the given read pair is:
    * Unique mapping -- Exactly one read-pair matches to the given genomic
      location.
-   * PCR duplicate -- If both R1 and R2 map to the exactly same location.
-   * Recurrent -- If more than one R1 match to the same location, but R2 match
-     to the different locations.
-   * deaminated -- If the reference is a T, and first base of the aligned R1
-     read is a C, then we call it de-aminated base.
+   * PCR duplicate -- More than one read pairs in which R1 and R2 map to the
+     exactly same location, and the R2s have exactly same end base. Because
+     barcodes are not used, this criterion overestimates PCR duplicates.
+   * Recurrent -- If more than one R1 match to the same location, but the
+     respective R2s match to different locations.
+   * deaminated -- If the reference base is a T, yet the first base of the
+     aligned R1 read is a C. The result is assumed to reflect the known rapid
+     deamination of a cytosine within a CPD.
 
 ## The steps Sequence Aanalysis - I
 
