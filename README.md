@@ -1,6 +1,6 @@
 # freqseq: A statistical method to quantify rare lesions at single-base resolution across the genome.
 
-## Structure of the script
+## Structure of the analysis
 
 The method is effectively divided into a number of steps. One of the primary
 requirements for this method to work is availablity of a high-performance
@@ -36,3 +36,48 @@ computing cluster. The basic steps involved in this method are as follows:
      to the different locations.
    * deaminated -- If the reference is a T, and first base of the aligned R1
      read is a C, then we call it de-aminated base.
+
+## The steps
+
+Here we will describe the exact steps that we use to analyze the data.
+
+ 1. First find the linkers, and designate the read with the linker to be R1, and
+    the other read to be R2.
+ 
+    This step is accomplished by running the script `findLinkers.py`. This is a
+    `Python` script that takes seven arguments. The linker sequence is
+    hard-coded in the script. The script finds the linker (searching within
+    first few bases of each read), and trims the read to remove everything upto
+    the end of the linker sequence
+    
+ 2. Align the trimmed reads.
+ 
+    The trimmed read pair is aligned to the reference genome using `bwa mem`
+    aligner.
+    
+ 3. Count locations.
+ 
+    From the aligned files count how many times the reads mapped correctly, and
+    also keep counts of all the read pairs that:
+    * Did not map.
+    * Mappted multiple times.
+    * Were of wrong insert size.
+    * Were not correctly mapped but were of other type.
+    * Reconstruct 10 upstream bases for each R1 alignment, and classify each
+      alignement according to the type, as PuPu, PuPy, PyPu, or PyPy.
+    
+    a. Sort and count duplicates
+ 
+       In this step, each class of lesions is sorted, and further classified as
+       
+       * Single 
+       * Recurrent
+       * PCR duplicatea
+       
+       And saved to individual files.
+ 
+ 4. Put Single and Recurrent Files together.
+ 
+After step 4, we have 16 output files for each sample.
+
+ 
