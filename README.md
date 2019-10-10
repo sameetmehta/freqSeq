@@ -37,7 +37,7 @@ computing cluster. The basic steps involved in this method are as follows:
    * deaminated -- If the reference is a T, and first base of the aligned R1
      read is a C, then we call it de-aminated base.
 
-## The steps
+## The steps Sequence Aanalysis - I
 
 Here we will describe the exact steps that we use to analyze the data.
 
@@ -70,14 +70,22 @@ Here we will describe the exact steps that we use to analyze the data.
  
        In this step, each class of lesions is sorted, and further classified as
        
-         * Single 
-         * Recurrent
-         * PCR duplicatea
+       * Single 
+       * Recurrent
+       * PCR duplicate
        
        And saved to individual files.
  
  4. Put Single and Recurrent Files together.
  
-After step 4, we have 16 output files for each sample.
+After step 4, we have 16 output files for each sample. For these we use the
+files that have all the lesions that are in the single+recurrent file for each
+of the sample. These files are `SAM` files with few extra columns. This is a
+tab-separated-file, and is quite amenable to analysis using `R`.
+
+## Steps for Analysis - II
+
+The single+recurrent lesions for each sample can be analyzed using `R`. Most the
+analysis is possible in a interactive manner.
 
  
