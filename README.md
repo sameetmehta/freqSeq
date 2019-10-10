@@ -60,7 +60,7 @@ Here we will describe the exact steps that we use to analyze the data.
     From the aligned files count how many times the reads mapped correctly, and
     also keep counts of all the read pairs that:
     * Did not map.
-    * Mappted multiple times.
+    * Mapped multiple times.
     * Were of wrong insert size.
     * Were not correctly mapped but were of other type.
     * Reconstruct 10 upstream bases for each R1 alignment, and classify each
@@ -70,9 +70,9 @@ Here we will describe the exact steps that we use to analyze the data.
  
        In this step, each class of lesions is sorted, and further classified as
        
-       * Single 
-       * Recurrent
-       * PCR duplicatea
+         * Single 
+         * Recurrent
+         * PCR duplicatea
        
        And saved to individual files.
  
