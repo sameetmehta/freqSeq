@@ -9,8 +9,8 @@ computing cluster. The basic steps involved in this method are as follows:
  * Determine which read of the fastq read pair has the linker. Designate the
    read having a linker as R1, and the other read as R2.
  * Trim the linker, and any preceding nucleotides. The first base of the R1 now
-   denotes the position immediately downstream (3') of the incision nick. In
-   case of cyclobutane pyrimidne dimer (CPD), the first base of R1 is the 3'
+   denotes the position immediately downstream (3') of the incision nick. In the 
+   case of the cyclobutane pyrimidine dimer (CPD), the first base of R1 is the 3'
    base of this two base PyPy lesion and is termed the "+1 base". If no linker
    sequence is found, the read pair is saved to a different file, and not used
    in the current analysis.
@@ -24,27 +24,28 @@ computing cluster. The basic steps involved in this method are as follows:
    class of lesion. For our purposes there are four classes of legions viz.,
    * PuPu -- The first base of R1, and immediate preceding base both are
      purines.
-   * PuPy -- The first base of R1 is a pyrimidne but immediate preceding base is
-     a purine.
+   * PuPy -- The first base of R1 is a pyrimidine and immediate preceding base
+     is a purine.
    * PyPu -- The first base of R1 is a purine, and immediate preceding base is a
-     pyrimidne.
+     pyrimidine.
    * PyPy -- The first base of the R1 is pyrimidine, and the immediate preceding
      base is also a pyrimdine.
  
- * For each of these files (classified according to the lesion) we determine if
-   the given read pair is:
+ * For each of these files (classified according to the lesion dinucleotide) we
+   determine whether the given read pair is:
    * Unique mapping -- Exactly one read-pair matches to the given genomic
-     location.
-   * PCR duplicate -- More than one read pairs in which R1 and R2 map to the
+     location, and that read-pair does not match to any other location in the
+     genome.
+   * PCR duplicate -- More than one read pair in which R1 and R2 map to the
      exactly same location, and the R2s have exactly same end base. Because
      barcodes are not used, this criterion overestimates PCR duplicates.
-   * Recurrent -- If more than one R1 match to the same location, but the
+   * Recurrent -- More than one R1 match to the same location, but the
      respective R2s match to different locations.
-   * deaminated -- If the reference base is a T, yet the first base of the
-     aligned R1 read is a C. The result is assumed to reflect the known rapid
+   * deaminated -- The reference base is a T, yet the first base of the aligned
+     R1 read is a C. The result is assumed to reflect the known rapid
      deamination of a cytosine within a CPD.
 
-### The steps Sequence Aanalysis - I
+### The steps for Sequence Analysis - I
 
 Here we will describe the exact steps that we use to analyze the data.
 
@@ -69,7 +70,8 @@ Here we will describe the exact steps that we use to analyze the data.
     * Did not map.
     * Mapped multiple times.
     * Were of wrong insert size.
-    * Were not correctly mapped but were of other type.
+    * Were not correctly mapped, or mapped to a non-canonical chromosome, or a
+      part of read maps outside of the chromosome boundary.
     * Reconstruct 10 upstream bases for each R1 alignment, and classify each
       alignement according to the type, as PuPu, PuPy, PyPu, or PyPy.
     
@@ -77,7 +79,7 @@ Here we will describe the exact steps that we use to analyze the data.
  
        In this step, each class of lesions is sorted, and further classified as
        
-       * Single 
+       * Single
        * Recurrent
        * PCR duplicate
        
@@ -87,7 +89,7 @@ Here we will describe the exact steps that we use to analyze the data.
  
 After step 4, we have 16 output files for each sample. For these we use the
 files that have all the lesions that are in the single+recurrent file for each
-of the sample. These files are `SAM` files with few extra columns. This is a
+of the sample. These files are `SAM` files with a few extra columns. This is a
 tab-separated-file, and is quite amenable to analysis using `R`.
 
 ### Steps for Analysis - II
